@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo de IA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .feature-importance {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Predição com Modelo de IA</h1>
+    <p>Este modelo foi treinado para prever a espécie de uma flor Iris com base nas medidas de suas sépalas e pétalas.</p>
+
+    <form id="prediction-form">
+        <label for="comprimento_sepala">Comprimento da Sépala:</label>
+        <input type="text" id="comprimento_sepala" name="comprimento_sepala"><br><br>
+        <label for="largura_sepala">Largura da Sépala:</label>
+        <input type="text" id="largura_sepala" name="largura_sepala"><br><br>
+        <label for="comprimento_petala">Comprimento da Pétala:</label>
+        <input type="text" id="comprimento_petala" name="comprimento_petala"><br><br>
+        <label for="largura_petala">Largura da Pétala:</label>
+        <input type="text" id="largura_petala" name="largura_petala"><br><br>
+        <button type="button" onclick="makePrediction()">Fazer Predição</button>
+    </form>
+    <h2>Resultado:</h2>
+    <p id="result"></p>
+
+    <h2>Importância das Features</h2>
+    <div class="feature-importance">
+        <table>
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>Importância</th>
+                </tr>
+            </thead>
+            <tbody id="feature-importance-body">
+                <!-- Os dados da importância das features serão inseridos aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Exemplos de Predições</h2>
+    <p>Aqui estão alguns exemplos de predições feitas pelo modelo:</p>
+    <ul>
+        <li>Comprimento da Sépala: 5.1, Largura da Sépala: 3.5, Comprimento da Pétala: 1.4, Largura da Pétala: 0.2 -> Espécie: Iris-setosa</li>
+        <li>Comprimento da Sépala: 6.7, Largura da Sépala: 3.1, Comprimento da Pétala: 4.4, Largura da Pétala: 1.4 -> Espécie: Iris-versicolor</li>
+        <li>Comprimento da Sépala: 7.2, Largura da Sépala: 3.6, Comprimento da Pétala: 6.1, Largura da Pétala: 2.5 -> Espécie: Iris-virginica</li>
+    </ul>
+
+    <script>
+        async function makePrediction() {
+            const form = document.getElementById('prediction-form');
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => data[key] = parseFloat(value));
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify([data])
+            });
+
+            const result = await response.json();
+            document.getElementById('result').innerText = `Predição: ${result}`;
+        }
+
+        // Função para carregar a importância das features
+        async function loadFeatureImportance() {
+            const response = await fetch('/feature-importance');
+            const data = await response.json();
+            const tbody = document.getElementById('feature-importance-body');
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                const featureCell = document.createElement('td');
+                featureCell.innerText = item.feature;
+                const importanceCell = document.createElement('td');
+                importanceCell.innerText = item.importance;
+                row.appendChild(featureCell);
+                row.appendChild(importanceCell);
+                tbody.appendChild(row);
+            });
+        }
+
+        // Carregar a importância das features ao carregar a página
+        window.onload = loadFeatureImportance;
+    </script>
+</body>
+</html>
