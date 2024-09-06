@@ -1,8 +1,8 @@
+import os
+import matplotlib.pyplot as plt
 from flask import Flask, request, jsonify, render_template, send_from_directory
 import joblib
 import pandas as pd
-import os
-import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 
@@ -18,6 +18,11 @@ def plot_feature_importance(model):
     plt.xlabel('Importância')
     plt.ylabel('Features')
     plt.title('Importância das Features')
+    
+    # Garantir que o diretório 'static' exista
+    if not os.path.exists('static'):
+        os.makedirs('static')
+    
     plt.savefig('static/feature_importance.png')
     plt.close()
 
@@ -41,6 +46,11 @@ def predict():
 @app.route('/static/<path:filename>')
 def static_files(filename):
     return send_from_directory('static', filename)
+
+# Rota para servir a imagem de importância das features
+@app.route('/feature-importance')
+def feature_importance():
+    return send_from_directory('static', 'feature_importance.png')
 
 if __name__ == '__main__':
     app.run(debug=True)
