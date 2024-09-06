@@ -51,6 +51,13 @@
         th {
             background-color: #f2f2f2;
         }
+        .prediction-result {
+            margin-top: 20px;
+        }
+        .prediction-result img {
+            max-width: 300px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -69,7 +76,7 @@
         <button type="button" onclick="makePrediction()">Fazer Predição</button>
     </form>
     <h2>Resultado:</h2>
-    <p id="result"></p>
+    <div id="result" class="prediction-result"></div>
 
     <h2>Importância das Features</h2>
     <div class="feature-importance">
@@ -110,7 +117,22 @@
             });
 
             const result = await response.json();
-            document.getElementById('result').innerText = `Predição: ${result}`;
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `Predição: ${result}`;
+
+            // Exibir a imagem correspondente à predição
+            let imageUrl = '';
+            if (result.includes('Iris-setosa')) {
+                imageUrl = '/static/iris_setosa.jpg';
+            } else if (result.includes('Iris-versicolor')) {
+                imageUrl = '/static/iris_versicolor.jpg';
+            } else if (result.includes('Iris-virginica')) {
+                imageUrl = '/static/iris_virginica.jpg';
+            }
+
+            if (imageUrl) {
+                resultDiv.innerHTML += `<br><img src="${imageUrl}" alt="Imagem da espécie prevista">`;
+            }
         }
 
         // Função para carregar a importância das features
