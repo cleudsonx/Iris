@@ -80,17 +80,7 @@
 
     <h2>Importância das Features</h2>
     <div class="feature-importance">
-        <table>
-            <thead>
-                <tr>
-                    <th>Feature</th>
-                    <th>Importância</th>
-                </tr>
-            </thead>
-            <tbody id="feature-importance-body">
-                <!-- Os dados da importância das features serão inseridos aqui -->
-            </tbody>
-        </table>
+        <img src="/static/feature_importance.png" alt="Importância das Features">
     </div>
 
     <h2>Exemplos de Predições</h2>
@@ -123,11 +113,11 @@
             // Exibir a imagem correspondente à predição
             let imageUrl = '';
             if (result.includes('Iris-setosa')) {
-                imageUrl = 'C:/Users/cleud/Documents/Pos-XPe/agente de IA/static/iris_setosa.jpg';
+                imageUrl = '/static/iris_setosa.jpg';
             } else if (result.includes('Iris-versicolor')) {
-                imageUrl = 'C:/Users/cleud/Documents/Pos-XPe/agente de IA/static/static/iris_versicolor.jpg';
+                imageUrl = '/static/iris_versicolor.jpg';
             } else if (result.includes('Iris-virginica')) {
-                imageUrl = 'C:/Users/cleud/Documents/Pos-XPe/agente de IA/static/static/iris_virginica.jpg';
+                imageUrl = '/static/iris_virginica.jpg';
             }
 
             if (imageUrl) {

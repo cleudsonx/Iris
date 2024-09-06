@@ -1,12 +1,28 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, send_from_directory
 import joblib
 import pandas as pd
 import os
+import matplotlib.pyplot as plt
 
 app = Flask(__name__)
 
 # Carregar o modelo treinado
 model = joblib.load('modelo.pkl')
+
+# Função para gerar o gráfico de importância das features
+def plot_feature_importance(model):
+    importances = model.feature_importances_
+    features = ['comprimento_sepala', 'largura_sepala', 'comprimento_petala', 'largura_petala']
+    plt.figure(figsize=(10, 6))
+    plt.barh(features, importances, color='skyblue')
+    plt.xlabel('Importância')
+    plt.ylabel('Features')
+    plt.title('Importância das Features')
+    plt.savefig('static/feature_importance.png')
+    plt.close()
+
+# Gerar o gráfico ao iniciar o servidor
+plot_feature_importance(model)
 
 # Rota para a página principal
 @app.route('/')
@@ -21,13 +37,10 @@ def predict():
     predictions = model.predict(df)
     return jsonify(predictions.tolist())
 
-# Rota para a importância das features
-@app.route('/feature-importance', methods=['GET'])
-def feature_importance():
-    importances = model.feature_importances_
-    features = ['comprimento_sepala', 'largura_sepala', 'comprimento_petala', 'largura_petala']
-    importance_data = [{'feature': feature, 'importance': importance} for feature, importance in zip(features, importances)]
-    return jsonify(importance_data)
+# Rota para servir a imagem de importância das features
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    return send_from_directory('static', filename)
 
 if __name__ == '__main__':
     app.run(debug=True)
