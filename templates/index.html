@@ -80,7 +80,7 @@
 
     <h2>Importância das Features</h2>
     <div class="feature-importance">
-        <img src="/feature-importance" alt="Importância das Features">
+        <img src="/static/feature_importance.png" alt="Importância das Features">
     </div>
 
     <h2>Exemplos de Predições</h2>
@@ -113,37 +113,17 @@
             // Exibir a imagem correspondente à predição
             let imageUrl = '';
             if (result.includes('Iris-setosa')) {
-                imageUrl = '/static/iris_setosa.jpg';
+                imageUrl = '/static/iris_setosa.jpeg';
             } else if (result.includes('Iris-versicolor')) {
-                imageUrl = '/static/iris_versicolor.jpg';
+                imageUrl = '/static/iris_versicolor.jpeg';
             } else if (result.includes('Iris-virginica')) {
-                imageUrl = '/static/iris_virginica.jpg';
+                imageUrl = '/static/iris_virginica.jpeg';
             }
 
             if (imageUrl) {
                 resultDiv.innerHTML += `<br><img src="${imageUrl}" alt="Imagem da espécie prevista">`;
             }
         }
-
-        // Função para carregar a importância das features
-        async function loadFeatureImportance() {
-            const response = await fetch('/feature-importance');
-            const data = await response.json();
-            const tbody = document.getElementById('feature-importance-body');
-            data.forEach(item => {
-                const row = document.createElement('tr');
-                const featureCell = document.createElement('td');
-                featureCell.innerText = item.feature;
-                const importanceCell = document.createElement('td');
-                importanceCell.innerText = item.importance;
-                row.appendChild(featureCell);
-                row.appendChild(importanceCell);
-                tbody.appendChild(row);
-            });
-        }
-
-        // Carregar a importância das features ao carregar a página
-        window.onload = loadFeatureImportance;
     </script>
 </body>
 </html>
