@@ -13,6 +13,9 @@ try:
 except Exception as e:
     print(f"Erro ao carregar o modelo: {e}")
 
+# Lista global para armazenar as últimas três predições
+ultimas_predicoes = []
+
 # Função para gerar o gráfico de importância das features
 def plot_feature_importance(model):
     try:
@@ -46,7 +49,7 @@ plot_feature_importance(model)
 @app.route('/')
 def home():
     print("Rota '/' acessada.")
-    return render_template('index.html')
+    return render_template('index.html', ultimas_predicoes=ultimas_predicoes)
 
 # Rota para predições
 @app.route('/predict', methods=['POST'])
@@ -57,6 +60,17 @@ def predict():
     df = pd.DataFrame(data)
     predictions = model.predict(df)
     print(f"Predições geradas: {predictions.tolist()}")
+
+    # Armazenar as últimas três predições
+    for i, pred in enumerate(predictions.tolist()):
+        predicao = {
+            'dados': data[i],
+            'predicao': pred
+        }
+        ultimas_predicoes.append(predicao)
+        if len(ultimas_predicoes) > 3:
+            ultimas_predicoes.pop(0)
+
     return jsonify(predictions.tolist())
 
 # Rota para servir arquivos estáticos
@@ -68,3 +82,4 @@ def static_files(filename):
 if __name__ == '__main__':
     print("Iniciando o servidor Flask...")
     app.run(debug=True)
+    

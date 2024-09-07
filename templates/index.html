@@ -62,12 +62,13 @@
     <h2>Resultado:</h2>
     <div id="result" class="prediction-result"></div>
 
-    <h2>Exemplos de Predições</h2>
-    <p>Aqui estão alguns exemplos de predições feitas pelo modelo:</p>
-    <ul>
-        <li>Comprimento da Sépala: 5.1, Largura da Sépala: 3.5, Comprimento da Pétala: 1.4, Largura da Pétala: 0.2 -> Espécie: Iris-setosa</li>
-        <li>Comprimento da Sépala: 6.7, Largura da Sépala: 3.1, Comprimento da Pétala: 4.4, Largura da Pétala: 1.4 -> Espécie: Iris-versicolor</li>
-        <li>Comprimento da Sépala: 7.2, Largura da Sépala: 3.6, Comprimento da Pétala: 6.1, Largura da Pétala: 2.5 -> Espécie: Iris-virginica</li>
+    <h2>Últimas 3 Predições</h2>
+    <ul id="ultimas-predicoes">
+        {% for predicao in ultimas_predicoes %}
+            <li>
+                Dados: {{ predicao.dados }} -> Predição: {{ predicao.predicao }}
+            </li>
+        {% endfor %}
     </ul>
 
     <script>
@@ -101,6 +102,17 @@
 
             if (imageUrl) {
                 resultDiv.innerHTML += `<br><img src="${imageUrl}" alt="Imagem da espécie prevista">`;
+            }
+
+            // Atualizar a lista de últimas predições
+            const ultimasPredicoesList = document.getElementById('ultimas-predicoes');
+            const newItem = document.createElement('li');
+            newItem.textContent = `Dados: ${JSON.stringify(data)} -> Predição: ${result}`;
+            ultimasPredicoesList.appendChild(newItem);
+
+            // Manter apenas as últimas 3 predições
+            while (ultimasPredicoesList.children.length > 3) {
+                ultimasPredicoesList.removeChild(ultimasPredicoesList.firstChild);
             }
         }
     </script>
