@@ -65,12 +65,6 @@ def static_files(filename):
     print(f"Rota '/static/{filename}' acessada.")
     return send_from_directory('static', filename)
 
-# Rota para servir a imagem de importância das features
-@app.route('/feature-importance')
-def feature_importance():
-    print("Rota '/feature-importance' acessada.")
-    return send_from_directory('static', 'feature_importance.jpeg')
-
 if __name__ == '__main__':
     print("Iniciando o servidor Flask...")
     app.run(debug=True)
