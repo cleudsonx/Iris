@@ -1,85 +1,65 @@
-import os
-import matplotlib.pyplot as plt
-from flask import Flask, request, jsonify, render_template, send_from_directory
+import streamlit as st
 import joblib
 import pandas as pd
-
-app = Flask(__name__)
 
 # Carregar o modelo treinado
 try:
     model = joblib.load('modelo.pkl')
-    print("Modelo carregado com sucesso.")
+    st.write("Modelo carregado com sucesso.")
 except Exception as e:
-    print(f"Erro ao carregar o modelo: {e}")
+    st.write(f"Erro ao carregar o modelo: {e}")
 
-# Lista global para armazenar as últimas três predições
-ultimas_predicoes = []
+# Lista global para armazenar as últimas cinco predições
+if 'ultimas_predicoes' not in st.session_state:
+    st.session_state.ultimas_predicoes = []
 
-# Função para gerar o gráfico de importância das features
-def plot_feature_importance(model):
-    try:
-        # Obter a importância das features do modelo
-        importances = model.feature_importances_
-        features = ['comprimento_sepala', 'largura_sepala', 'comprimento_petala', 'largura_petala']
-        
-        # Criar o gráfico de barras horizontal
-        plt.figure(figsize=(10, 6))
-        plt.barh(features, importances, color='skyblue')
-        plt.xlabel('Importância')
-        plt.ylabel('Features')
-        plt.title('Importância das Features')
-        
-        # Garantir que o diretório 'static' exista
-        if not os.path.exists('static'):
-            os.makedirs('static')
-            print("Diretório 'static' criado.")
-        
-        # Salvar o gráfico no diretório 'static' com a extensão .jpeg
-        plt.savefig('static/feature_importance.jpeg', format='jpeg')
-        plt.close()
-        print("Imagem feature_importance.jpeg gerada e salva no diretório 'static'.")
-    except Exception as e:
-        print(f"Erro ao gerar o gráfico de importância das features: {e}")
+# Função para fazer predições
+def fazer_predicao(dados):
+    df = pd.DataFrame([dados])
+    predicao = model.predict(df)[0]
+    return predicao
 
-# Gerar o gráfico ao iniciar o servidor
-plot_feature_importance(model)
+# Interface do usuário
+st.title("Predição com Modelo de IA")
+st.write("Este modelo foi treinado para prever a espécie de uma flor Iris com base nas medidas de suas sépalas e pétalas.")
 
-# Rota para a página principal
-@app.route('/')
-def home():
-    print("Rota '/' acessada.")
-    return render_template('index.html', ultimas_predicoes=ultimas_predicoes)
+# Formulário para entrada de dados
+comprimento_sepala = st.number_input("Comprimento da Sépala", min_value=0.0, step=0.1)
+largura_sepala = st.number_input("Largura da Sépala", min_value=0.0, step=0.1)
+comprimento_petala = st.number_input("Comprimento da Pétala", min_value=0.0, step=0.1)
+largura_petala = st.number_input("Largura da Pétala", min_value=0.0, step=0.1)
 
-# Rota para predições
-@app.route('/predict', methods=['POST'])
-def predict():
-    print("Rota '/predict' acessada.")
-    data = request.get_json(force=True)
-    print(f"Dados recebidos para predição: {data}")
-    df = pd.DataFrame(data)
-    predictions = model.predict(df)
-    print(f"Predições geradas: {predictions.tolist()}")
+if st.button("Fazer Predição"):
+    dados = {
+        'comprimento_sepala': comprimento_sepala,
+        'largura_sepala': largura_sepala,
+        'comprimento_petala': comprimento_petala,
+        'largura_petala': largura_petala
+    }
+    predicao = fazer_predicao(dados)
+    st.write(f"Predição: {predicao}")
 
-    # Armazenar as últimas três predições
-    for i, pred in enumerate(predictions.tolist()):
-        predicao = {
-            'dados': data[i],
-            'predicao': pred
-        }
-        ultimas_predicoes.append(predicao)
-        if len(ultimas_predicoes) > 3:
-            ultimas_predicoes.pop(0)
+    # Selecionar a imagem correspondente à predição
+    if predicao == 'Iris-setosa':
+        image_url = 'static/iris_setosa.jpeg'
+    elif predicao == 'Iris-versicolor':
+        image_url = 'static/iris_versicolor.jpeg'
+    elif predicao == 'Iris-virginica':
+        image_url = 'static/iris_virginica.jpeg'
+    else:
+        image_url = None
 
-    return jsonify(predictions.tolist())
+    if image_url:
+        st.image(image_url, caption=f"Imagem da espécie prevista: {predicao}")
 
-# Rota para servir arquivos estáticos
-@app.route('/static/<path:filename>')
-def static_files(filename):
-    print(f"Rota '/static/{filename}' acessada.")
-    return send_from_directory('static', filename)
+    # Armazenar as últimas cinco predições
+    st.session_state.ultimas_predicoes.append({'predicao': predicao, 'image_url': image_url})
+    if len(st.session_state.ultimas_predicoes) > 5:
+        st.session_state.ultimas_predicoes.pop(0)
 
-if __name__ == '__main__':
-    print("Iniciando o servidor Flask...")
-    app.run(debug=True)
-    
+# Exibir as últimas cinco predições na ordem da mais atual para a mais antiga
+st.write("Últimas 5 Predições:")
+cols = st.columns(5)
+for i, pred in enumerate(reversed(st.session_state.ultimas_predicoes)):
+    with cols[i]:
+        st.image(pred['image_url'], caption=f"{pred['predicao']}", width=100)
