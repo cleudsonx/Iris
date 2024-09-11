@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelo de IA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        form {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .prediction-result {
+            margin-top: 20px;
+        }
+        .prediction-result img {
+            max-width: 300px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Predição com Modelo de IA</h1>
+    <p>Este modelo foi treinado para prever a espécie de uma flor Iris com base nas medidas de suas sépalas e pétalas.</p>
+
+    <form id="prediction-form">
+        <label for="comprimento_sepala">Comprimento da Sépala:</label>
+        <input type="text" id="comprimento_sepala" name="comprimento_sepala"><br><br>
+        <label for="largura_sepala">Largura da Sépala:</label>
+        <input type="text" id="largura_sepala" name="largura_sepala"><br><br>
+        <label for="comprimento_petala">Comprimento da Pétala:</label>
+        <input type="text" id="comprimento_petala" name="comprimento_petala"><br><br>
+        <label for="largura_petala">Largura da Pétala:</label>
+        <input type="text" id="largura_petala" name="largura_petala"><br><br>
+        <button type="button" onclick="makePrediction()">Fazer Predição</button>
+    </form>
+    <h2>Resultado:</h2>
+    <div id="result" class="prediction-result"></div>
+
+    <h2>Últimas 3 Predições</h2>
+    <ul id="ultimas-predicoes">
+        {% for predicao in ultimas_predicoes %}
+            <li>
+                Dados: {{ predicao.dados }} -> Predição: {{ predicao.predicao }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <script>
+        async function makePrediction() {
+            const form = document.getElementById('prediction-form');
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => data[key] = parseFloat(value));
+
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify([data])
+            });
+
+            const result = await response.json();
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `Predição: ${result}`;
+
+            // Exibir a imagem correspondente à predição
+            let imageUrl = '';
+            if (result.includes('Iris-setosa')) {
+                imageUrl = '/static/iris_setosa.jpeg';
+            } else if (result.includes('Iris-versicolor')) {
+                imageUrl = '/static/iris_versicolor.jpeg';
+            } else if (result.includes('Iris-virginica')) {
+                imageUrl = '/static/iris_virginica.jpeg';
+            }
+
+            if (imageUrl) {
+                resultDiv.innerHTML += `<br><img src="${imageUrl}" alt="Imagem da espécie prevista">`;
+            }
+
+            // Atualizar a lista de últimas predições
+            const ultimasPredicoesList = document.getElementById('ultimas-predicoes');
+            const newItem = document.createElement('li');
+            newItem.textContent = `Dados: ${JSON.stringify(data)} -> Predição: ${result}`;
+            ultimasPredicoesList.appendChild(newItem);
+
+            // Manter apenas as últimas 3 predições
+            while (ultimasPredicoesList.children.length > 3) {
+                ultimasPredicoesList.removeChild(ultimasPredicoesList.firstChild);
+            }
+        }
+    </script>
+</body>
+</html>
