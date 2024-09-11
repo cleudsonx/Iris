@@ -1,6 +1,6 @@
-import streamlit as st
-import joblib
-import pandas as pd
+import streamlit as st  # Importar a biblioteca Streamlit
+import joblib           # Importar a biblioteca Joblib
+import pandas as pd     # Importar a biblioteca Pandas
 
 # Carregar o modelo treinado
 try:
@@ -24,7 +24,7 @@ st.title("Predição com Modelo de IA")
 st.write("Este modelo foi treinado para prever a espécie de uma flor Iris com base nas medidas de suas sépalas e pétalas.")
 
 # Formulário para entrada de dados
-comprimento_sepala = st.number_input("Comprimento da Sépala", min_value=0.0, step=0.1)
+comprimento_sepala = st.number_input("Comprimento da Sépala", min_value=0.0, step=0.0)
 largura_sepala = st.number_input("Largura da Sépala", min_value=0.0, step=0.1)
 comprimento_petala = st.number_input("Comprimento da Pétala", min_value=0.0, step=0.1)
 largura_petala = st.number_input("Largura da Pétala", min_value=0.0, step=0.1)
@@ -37,7 +37,7 @@ if st.button("Fazer Predição"):
         'largura_petala': largura_petala
     }
     predicao = fazer_predicao(dados)
-    st.write(f"Predição: {predicao}")
+    st.write(f"Predição Atual: {predicao}")
 
     # Selecionar a imagem correspondente à predição
     if predicao == 'Iris-setosa':
