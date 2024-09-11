@@ -21,6 +21,7 @@ def fazer_predicao(dados):
 
 # Interface do usuário
 st.title("Predição com Modelo de IA")
+
 st.write("Este modelo foi treinado para prever a espécie de uma flor Iris com base nas medidas de suas sépalas e pétalas.")
 
 # Formulário para entrada de dados
