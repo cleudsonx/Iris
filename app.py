@@ -5,7 +5,7 @@ import pandas as pd     # Importar a biblioteca Pandas
 # Carregar o modelo treinado
 try:
     model = joblib.load('modelo.pkl')
-    st.write("Modelo carregado com sucesso.")
+    #st.write("Modelo carregado com sucesso.")
 except Exception as e:
     st.write(f"Erro ao carregar o modelo: {e}")
 
