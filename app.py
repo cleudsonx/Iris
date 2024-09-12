@@ -71,4 +71,3 @@ for i, pred in enumerate(reversed(st.session_state.ultimas_predicoes)):
             st.image(pred['image_url'], caption=f"{pred['predicao']}", width=100)
         else:
             st.write(f"{pred['predicao']}")
-            
