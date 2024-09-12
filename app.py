@@ -1,11 +1,11 @@
-import streamlit as st  # Importar a biblioteca Streamlit
-import joblib           # Importar a biblioteca Joblib
-import pandas as pd     # Importar a biblioteca Pandas
+import streamlit as st
+import joblib
+import pandas as pd
 
 # Carregar o modelo treinado
 try:
     model = joblib.load('modelo.pkl')
-    #st.write("Modelo carregado com sucesso.")
+    st.write("Modelo carregado com sucesso.")
 except Exception as e:
     st.write(f"Erro ao carregar o modelo: {e}")
 
@@ -21,11 +21,10 @@ def fazer_predicao(dados):
 
 # Interface do usuário
 st.title("Predição com Modelo de IA")
-
 st.write("Este modelo foi treinado para prever a espécie de uma flor Iris com base nas medidas de suas sépalas e pétalas.")
 
 # Formulário para entrada de dados
-comprimento_sepala = st.number_input("Comprimento da Sépala", min_value=0.0, step=0.0)
+comprimento_sepala = st.number_input("Comprimento da Sépala", min_value=0.0, step=0.1)
 largura_sepala = st.number_input("Largura da Sépala", min_value=0.0, step=0.1)
 comprimento_petala = st.number_input("Comprimento da Pétala", min_value=0.0, step=0.1)
 largura_petala = st.number_input("Largura da Pétala", min_value=0.0, step=0.1)
@@ -38,7 +37,7 @@ if st.button("Fazer Predição"):
         'largura_petala': largura_petala
     }
     predicao = fazer_predicao(dados)
-    st.write(f"Predição Atual: {predicao}")
+    st.write(f"Predição: {predicao}")
 
     # Selecionar a imagem correspondente à predição
     if predicao == 'Iris-setosa':
@@ -64,5 +63,4 @@ cols = st.columns(5)
 for i, pred in enumerate(reversed(st.session_state.ultimas_predicoes)):
     with cols[i]:
         st.image(pred['image_url'], caption=f"{pred['predicao']}", width=100)
-        
         
