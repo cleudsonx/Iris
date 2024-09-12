@@ -7,7 +7,7 @@ try:
     model = joblib.load('modelo.pkl')
     st.write("Modelo carregado com sucesso.")
 except Exception as e:
-    st.write(f"Erro ao carregar o modelo: {e}")
+    st.error(f"Erro ao carregar o modelo: {e}")
 
 # Lista global para armazenar as últimas cinco predições
 if 'ultimas_predicoes' not in st.session_state:
@@ -15,9 +15,13 @@ if 'ultimas_predicoes' not in st.session_state:
 
 # Função para fazer predições
 def fazer_predicao(dados):
-    df = pd.DataFrame([dados])
-    predicao = model.predict(df)[0]
-    return predicao
+    try:
+        df = pd.DataFrame([dados])
+        predicao = model.predict(df)[0]
+        return predicao
+    except Exception as e:
+        st.error(f"Erro ao fazer a predição: {e}")
+        return None
 
 # Interface do usuário
 st.title("Predição com Modelo de IA")
@@ -37,32 +41,34 @@ if st.button("Fazer Predição"):
         'largura_petala': largura_petala
     }
     predicao = fazer_predicao(dados)
-    st.write(f"Predição: {predicao}")
+    if predicao:
+        st.write(f"Predição: {predicao}")
 
-    # Selecionar a imagem correspondente à predição
-    if predicao == 'Iris-setosa':
-        image_url = 'static/iris_setosa.jpeg'
-    elif predicao == 'Iris-versicolor':
-        image_url = 'static/iris_versicolor.jpeg'
-    elif predicao == 'Iris-virginica':
-        image_url = 'static/iris_virginica.jpeg'
-    else:
-        image_url = None
+        # Selecionar a imagem correspondente à predição
+        if predicao == 'Iris-setosa':
+            image_url = 'static/iris_setosa.jpeg'
+        elif predicao == 'Iris-versicolor':
+            image_url = 'static/iris_versicolor.jpeg'
+        elif predicao == 'Iris-virginica':
+            image_url = 'static/iris_virginica.jpeg'
+        else:
+            image_url = None
 
-    if image_url:
-        st.image(image_url, caption=f"Imagem da espécie prevista: {predicao}")
+        if image_url:
+            st.image(image_url, caption=f"Imagem da espécie prevista: {predicao}", width=300)
 
-    # Armazenar as últimas cinco predições
-    st.session_state.ultimas_predicoes.append({'predicao': predicao, 'image_url': image_url})
-    if len(st.session_state.ultimas_predicoes) > 5:
-        st.session_state.ultimas_predicoes.pop(0)
+        # Armazenar as últimas cinco predições
+        st.session_state.ultimas_predicoes.append({'predicao': predicao, 'image_url': image_url})
+        if len(st.session_state.ultimas_predicoes) > 5:
+            st.session_state.ultimas_predicoes.pop(0)
 
 # Exibir as últimas cinco predições na ordem da mais atual para a mais antiga
 st.write("Últimas 5 Predições:")
 cols = st.columns(5)
 for i, pred in enumerate(reversed(st.session_state.ultimas_predicoes)):
     with cols[i]:
-        st.image(pred['image_url'], caption=f"{pred['predicao']}", width=100)
-        
-        
-        
+        if pred['image_url']:
+            st.image(pred['image_url'], caption=f"{pred['predicao']}", width=100)
+        else:
+            st.write(f"{pred['predicao']}")
+            
